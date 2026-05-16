@@ -1,0 +1,271 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "14e7d6dedf908698eef3cb53e79ff843",
+    "entities": [
+      {
+        "tableName": "gtfs_routes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`route_id` TEXT NOT NULL, `agency_id` TEXT, `route_short_name` TEXT NOT NULL, `route_long_name` TEXT NOT NULL, `route_type` INTEGER NOT NULL, `route_color` TEXT, `route_text_color` TEXT, PRIMARY KEY(`route_id`))",
+        "fields": [
+          {
+            "fieldPath": "routeId",
+            "columnName": "route_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "agencyId",
+            "columnName": "agency_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "routeShortName",
+            "columnName": "route_short_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeLongName",
+            "columnName": "route_long_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeType",
+            "columnName": "route_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeColor",
+            "columnName": "route_color",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "routeTextColor",
+            "columnName": "route_text_color",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "route_id"
+          ]
+        }
+      },
+      {
+        "tableName": "gtfs_stops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stop_id` TEXT NOT NULL, `stop_name` TEXT NOT NULL, `stop_lat` REAL NOT NULL, `stop_lon` REAL NOT NULL, `stop_code` TEXT, `location_type` INTEGER NOT NULL, `parent_station` TEXT, PRIMARY KEY(`stop_id`))",
+        "fields": [
+          {
+            "fieldPath": "stopId",
+            "columnName": "stop_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopName",
+            "columnName": "stop_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLat",
+            "columnName": "stop_lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLon",
+            "columnName": "stop_lon",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopCode",
+            "columnName": "stop_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "locationType",
+            "columnName": "location_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentStation",
+            "columnName": "parent_station",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "stop_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_gtfs_stops_stop_name",
+            "unique": false,
+            "columnNames": [
+              "stop_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_gtfs_stops_stop_name` ON `${TABLE_NAME}` (`stop_name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "gtfs_trips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trip_id` TEXT NOT NULL, `route_id` TEXT NOT NULL, `service_id` TEXT NOT NULL, `trip_headsign` TEXT, `direction_id` INTEGER, `shape_id` TEXT, PRIMARY KEY(`trip_id`))",
+        "fields": [
+          {
+            "fieldPath": "tripId",
+            "columnName": "trip_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "routeId",
+            "columnName": "route_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serviceId",
+            "columnName": "service_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tripHeadsign",
+            "columnName": "trip_headsign",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "directionId",
+            "columnName": "direction_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "shapeId",
+            "columnName": "shape_id",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "trip_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_gtfs_trips_route_id",
+            "unique": false,
+            "columnNames": [
+              "route_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_gtfs_trips_route_id` ON `${TABLE_NAME}` (`route_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "gtfs_stop_times",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trip_id` TEXT NOT NULL, `stop_sequence` INTEGER NOT NULL, `stop_id` TEXT NOT NULL, `arrival_time` TEXT NOT NULL, `departure_time` TEXT NOT NULL, `pickup_type` INTEGER, `drop_off_type` INTEGER, PRIMARY KEY(`trip_id`, `stop_sequence`))",
+        "fields": [
+          {
+            "fieldPath": "tripId",
+            "columnName": "trip_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopSequence",
+            "columnName": "stop_sequence",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopId",
+            "columnName": "stop_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "arrivalTime",
+            "columnName": "arrival_time",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "departureTime",
+            "columnName": "departure_time",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pickupType",
+            "columnName": "pickup_type",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dropOffType",
+            "columnName": "drop_off_type",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "trip_id",
+            "stop_sequence"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_gtfs_stop_times_stop_id",
+            "unique": false,
+            "columnNames": [
+              "stop_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_gtfs_stop_times_stop_id` ON `${TABLE_NAME}` (`stop_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "gtfs_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '14e7d6dedf908698eef3cb53e79ff843')"
+    ]
+  }
+}
