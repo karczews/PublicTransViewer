@@ -8,6 +8,7 @@ import com.github.karczews.publictarnsvisualizer.data.db.dao.TripDao
 import com.github.karczews.publictarnsvisualizer.data.model.LatLon
 import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
 import com.github.karczews.publictarnsvisualizer.data.model.RouteStop
+import androidx.core.graphics.toColorInt
 
 interface RouteDisplayRepository {
     suspend fun loadRouteForTrip(tripId: String): RouteDisplayData?
@@ -58,7 +59,7 @@ class DefaultRouteDisplayRepository(
         if (hex.isNullOrBlank()) return DEFAULT_COLOR
         return runCatching {
             val cleaned = hex.removePrefix("#")
-            android.graphics.Color.parseColor("#$cleaned")
+            "#$cleaned".toColorInt()
         }.getOrElse { DEFAULT_COLOR }
     }
 

@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -216,7 +217,7 @@ private fun parseRouteColor(hex: String?): Color {
     if (hex.isNullOrBlank()) return Color(0xFF455A64)
     return runCatching {
         val cleaned = hex.removePrefix("#")
-        Color(android.graphics.Color.parseColor("#$cleaned"))
+        Color("#$cleaned".toColorInt())
     }.getOrElse { Color(0xFF455A64) }
 }
 
