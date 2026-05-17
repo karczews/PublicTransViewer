@@ -7,11 +7,14 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.karczews.publictarnsvisualizer.data.db.GtfsDatabase
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
+import com.github.karczews.publictarnsvisualizer.data.repository.AlertRepository
+import com.github.karczews.publictarnsvisualizer.data.repository.DefaultAlertRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.DefaultStopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.DefaultVehicleRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
+import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtAlertDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtTripUpdateDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtVehicleDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
@@ -50,6 +53,10 @@ class PublicTransApp : Application() {
         GtfsRtTripUpdateDataSource(gtfsRtApi)
     }
 
+    private val alertDataSource: GtfsRtAlertDataSource by lazy {
+        GtfsRtAlertDataSource(gtfsRtApi)
+    }
+
     val gtfsStaticDataSource: GtfsStaticDataSource by lazy {
         GtfsStaticDataSource(httpClient, database)
     }
@@ -66,6 +73,10 @@ class PublicTransApp : Application() {
             stopTimeDao = database.stopTimeDao(),
             stopDao = database.stopDao(),
         )
+    }
+
+    val alertRepository: AlertRepository by lazy {
+        DefaultAlertRepository(alertDataSource, database.routeDao())
     }
 
     val stopRepository: StopRepository by lazy {

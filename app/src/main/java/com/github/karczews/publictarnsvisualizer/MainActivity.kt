@@ -21,10 +21,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsScreen
+import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModel
+import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeScreen
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModel
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModelFactory
-import com.github.karczews.publictarnsvisualizer.ui.profile.ProfileScreen
 import com.github.karczews.publictarnsvisualizer.ui.stops.StopsScreen
 import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModel
 import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModelFactory
@@ -54,6 +56,7 @@ class MainActivity : ComponentActivity() {
                             app.routeDisplayRepository,
                         ),
                         stopsViewModelFactory = StopsViewModelFactory(app.stopRepository),
+                        alertsViewModelFactory = AlertsViewModelFactory(app.alertRepository),
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -85,6 +88,7 @@ class MainActivity : ComponentActivity() {
 fun PublicTarnsVisualizerApp(
     homeViewModelFactory: HomeViewModelFactory,
     stopsViewModelFactory: StopsViewModelFactory,
+    alertsViewModelFactory: AlertsViewModelFactory,
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
@@ -114,7 +118,10 @@ fun PublicTarnsVisualizerApp(
                 val stopsViewModel: StopsViewModel = viewModel(factory = stopsViewModelFactory)
                 StopsScreen(viewModel = stopsViewModel)
             }
-            AppDestinations.PROFILE -> ProfileScreen()
+            AppDestinations.ALERTS -> {
+                val alertsViewModel: AlertsViewModel = viewModel(factory = alertsViewModelFactory)
+                AlertsScreen(viewModel = alertsViewModel)
+            }
         }
     }
 }
@@ -125,5 +132,5 @@ enum class AppDestinations(
 ) {
     HOME("Home", R.drawable.ic_home),
     STOPS("Stops", R.drawable.ic_bus),
-    PROFILE("Profile", R.drawable.ic_account_box),
+    ALERTS("Alerts", R.drawable.ic_alert),
 }
