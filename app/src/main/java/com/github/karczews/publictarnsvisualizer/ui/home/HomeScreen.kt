@@ -3,6 +3,7 @@ package com.github.karczews.publictarnsvisualizer.ui.home
 import android.graphics.Color
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -63,6 +64,7 @@ fun HomeScreen(
         state = mapViewState,
         infrastructure = mapDisplayInfrastructure,
         modifier = modifier.fillMaxSize(),
+        onMapClick = { viewModel.clearSelection() },
     ) {
         routeDisplay?.let { route ->
             RouteOverlay(route = route)
@@ -87,6 +89,11 @@ private fun VehicleMarker(
     onSelect: () -> Unit,
 ) {
     val markerState = rememberMarkerState()
+    LaunchedEffect(isSelected) {
+        if (!isSelected && markerState.isSelected()) {
+            markerState.deselect()
+        }
+    }
     Marker(
         data = MarkerData(
             geoPoint = GeoPoint(vehicle.latitude, vehicle.longitude),
