@@ -14,16 +14,23 @@ concurrency:
 jobs:
   unit-tests:
     uses: ./.github/workflows/run-tests.yml
+    secrets: inherit
 
   lint:
     uses: ./.github/workflows/lint.yml
+    secrets: inherit
 
   build:
     uses: ./.github/workflows/build.yml
+    secrets: inherit
+
+  instrumented-tests:
+    uses: ./.github/workflows/instrumented-tests.yml
+    secrets: inherit
 
   gate:
     if: github.event_name == 'pull_request'
-    needs: [unit-tests, lint, build]
+    needs: [unit-tests, lint, build, instrumented-tests]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed"

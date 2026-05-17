@@ -16,7 +16,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew lintDebug -PtomtomApiKey=""
+      - run: ./gradlew lintDebug
+        env:
+          ORG_GRADLE_PROJECT_tomtomApiKey: ${{ secrets.TOMTOM_API_KEY }}
 
       - uses: actions/upload-artifact@v4
         if: always()

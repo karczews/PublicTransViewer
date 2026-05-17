@@ -16,4 +16,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew assembleDebug -PtomtomApiKey=""
+      - run: ./gradlew assembleDebug
+        env:
+          ORG_GRADLE_PROJECT_tomtomApiKey: ${{ secrets.TOMTOM_API_KEY }}
