@@ -21,11 +21,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.karczews.publictarnsvisualizer.ui.favorites.FavoritesScreen
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeScreen
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModel
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.profile.ProfileScreen
+import com.github.karczews.publictarnsvisualizer.ui.stops.StopsScreen
+import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModel
+import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.theme.PublicTarnsVisualizerTheme
 import com.tomtom.sdk.common.configuration.buildSdkConfiguration
 import com.tomtom.sdk.init.TomTomSdk
@@ -47,7 +49,8 @@ class MainActivity : ComponentActivity() {
                 if (isReady) {
                     val app = application as PublicTransApp
                     PublicTarnsVisualizerApp(
-                        viewModelFactory = HomeViewModelFactory(app.vehicleRepository),
+                        homeViewModelFactory = HomeViewModelFactory(app.vehicleRepository),
+                        stopsViewModelFactory = StopsViewModelFactory(app.stopRepository),
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -76,7 +79,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PublicTarnsVisualizerApp(viewModelFactory: HomeViewModelFactory) {
+fun PublicTarnsVisualizerApp(
+    homeViewModelFactory: HomeViewModelFactory,
+    stopsViewModelFactory: StopsViewModelFactory,
+) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -98,10 +104,13 @@ fun PublicTarnsVisualizerApp(viewModelFactory: HomeViewModelFactory) {
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> {
-                val homeViewModel: HomeViewModel = viewModel(factory = viewModelFactory)
+                val homeViewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
                 HomeScreen(viewModel = homeViewModel)
             }
-            AppDestinations.FAVORITES -> FavoritesScreen()
+            AppDestinations.STOPS -> {
+                val stopsViewModel: StopsViewModel = viewModel(factory = stopsViewModelFactory)
+                StopsScreen(viewModel = stopsViewModel)
+            }
             AppDestinations.PROFILE -> ProfileScreen()
         }
     }
@@ -112,6 +121,6 @@ enum class AppDestinations(
     val icon: Int,
 ) {
     HOME("Home", R.drawable.ic_home),
-    FAVORITES("Favorites", R.drawable.ic_favorite),
+    STOPS("Stops", R.drawable.ic_bus),
     PROFILE("Profile", R.drawable.ic_account_box),
 }

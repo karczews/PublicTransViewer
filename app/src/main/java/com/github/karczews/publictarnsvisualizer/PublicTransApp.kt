@@ -7,8 +7,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.karczews.publictarnsvisualizer.data.db.GtfsDatabase
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
+import com.github.karczews.publictarnsvisualizer.data.repository.DefaultStopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.DefaultVehicleRepository
+import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
+import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtTripUpdateDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtVehicleDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
 import com.github.karczews.publictarnsvisualizer.data.worker.GtfsRefreshWorker
@@ -40,12 +43,26 @@ class PublicTransApp : Application() {
         GtfsRtVehicleDataSource(gtfsRtApi)
     }
 
+    private val tripUpdateDataSource: GtfsRtTripUpdateDataSource by lazy {
+        GtfsRtTripUpdateDataSource(gtfsRtApi)
+    }
+
     val gtfsStaticDataSource: GtfsStaticDataSource by lazy {
         GtfsStaticDataSource(httpClient, database)
     }
 
     val vehicleRepository: VehicleRepository by lazy {
         DefaultVehicleRepository(vehicleDataSource, database.routeDao(), database.tripDao())
+    }
+
+    val stopRepository: StopRepository by lazy {
+        DefaultStopRepository(
+            stopDao = database.stopDao(),
+            stopTimeDao = database.stopTimeDao(),
+            tripDao = database.tripDao(),
+            routeDao = database.routeDao(),
+            tripUpdateDataSource = tripUpdateDataSource,
+        )
     }
 
     override fun onCreate() {
