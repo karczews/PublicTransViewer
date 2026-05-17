@@ -6,9 +6,13 @@ import com.github.karczews.publictarnsvisualizer.data.model.TripUpdate
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
 import com.google.transit.realtime.GtfsRealtime
 
-class GtfsRtTripUpdateDataSource(private val api: GtfsRtApi) {
+interface TripUpdateDataSource {
+    suspend fun getTripUpdates(): List<TripUpdate>
+}
 
-    suspend fun getTripUpdates(): List<TripUpdate> {
+class GtfsRtTripUpdateDataSource(private val api: GtfsRtApi) : TripUpdateDataSource {
+
+    override suspend fun getTripUpdates(): List<TripUpdate> {
         val feedMessage = api.fetchTripUpdates().getOrThrow()
         return feedMessage.entityList
             .filter { it.hasTripUpdate() }

@@ -18,25 +18,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsScreen
 import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModel
-import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeScreen
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModel
-import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.stops.StopsScreen
 import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModel
-import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModelFactory
 import com.github.karczews.publictarnsvisualizer.ui.theme.PublicTarnsVisualizerTheme
 import com.tomtom.sdk.common.configuration.buildSdkConfiguration
 import com.tomtom.sdk.init.TomTomSdk
 import com.tomtom.sdk.telemetry.UserConsent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val sdkInitialized = MutableStateFlow(false)
@@ -49,15 +48,7 @@ class MainActivity : ComponentActivity() {
             PublicTarnsVisualizerTheme {
                 val isReady by sdkInitialized.collectAsStateWithLifecycle()
                 if (isReady) {
-                    val app = application as PublicTransApp
-                    PublicTarnsVisualizerApp(
-                        homeViewModelFactory = HomeViewModelFactory(
-                            app.vehicleRepository,
-                            app.routeDisplayRepository,
-                        ),
-                        stopsViewModelFactory = StopsViewModelFactory(app.stopRepository),
-                        alertsViewModelFactory = AlertsViewModelFactory(app.alertRepository),
-                    )
+                    PublicTarnsVisualizerApp()
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -85,11 +76,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PublicTarnsVisualizerApp(
-    homeViewModelFactory: HomeViewModelFactory,
-    stopsViewModelFactory: StopsViewModelFactory,
-    alertsViewModelFactory: AlertsViewModelFactory,
-) {
+fun PublicTarnsVisualizerApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -111,15 +98,15 @@ fun PublicTarnsVisualizerApp(
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> {
-                val homeViewModel: HomeViewModel = viewModel(factory = homeViewModelFactory)
+                val homeViewModel: HomeViewModel = hiltViewModel()
                 HomeScreen(viewModel = homeViewModel)
             }
             AppDestinations.STOPS -> {
-                val stopsViewModel: StopsViewModel = viewModel(factory = stopsViewModelFactory)
+                val stopsViewModel: StopsViewModel = hiltViewModel()
                 StopsScreen(viewModel = stopsViewModel)
             }
             AppDestinations.ALERTS -> {
-                val alertsViewModel: AlertsViewModel = viewModel(factory = alertsViewModelFactory)
+                val alertsViewModel: AlertsViewModel = hiltViewModel()
                 AlertsScreen(viewModel = alertsViewModel)
             }
         }

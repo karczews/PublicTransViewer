@@ -2,7 +2,7 @@ package com.github.karczews.publictarnsvisualizer.data.repository
 
 import com.github.karczews.publictarnsvisualizer.data.db.dao.RouteDao
 import com.github.karczews.publictarnsvisualizer.data.model.ServiceAlert
-import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtAlertDataSource
+import com.github.karczews.publictarnsvisualizer.data.source.AlertDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -12,7 +12,7 @@ interface AlertRepository {
 }
 
 class DefaultAlertRepository(
-    private val alertDataSource: GtfsRtAlertDataSource,
+    private val alertDataSource: AlertDataSource,
     private val routeDao: RouteDao,
 ) : AlertRepository {
 

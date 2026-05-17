@@ -8,7 +8,7 @@ import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.model.StopDeparture
 import com.github.karczews.publictarnsvisualizer.data.model.TripUpdate
 import com.github.karczews.publictarnsvisualizer.data.model.VehicleType
-import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtTripUpdateDataSource
+import com.github.karczews.publictarnsvisualizer.data.source.TripUpdateDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -24,7 +24,7 @@ class DefaultStopRepository(
     private val stopTimeDao: StopTimeDao,
     private val tripDao: TripDao,
     private val routeDao: RouteDao,
-    private val tripUpdateDataSource: GtfsRtTripUpdateDataSource,
+    private val tripUpdateDataSource: TripUpdateDataSource,
     private val clock: () -> Calendar = { Calendar.getInstance() },
 ) : StopRepository {
 

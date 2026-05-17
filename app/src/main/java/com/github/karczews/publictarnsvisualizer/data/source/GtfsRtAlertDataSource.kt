@@ -7,9 +7,13 @@ import com.github.karczews.publictarnsvisualizer.data.model.ServiceAlert
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
 import com.google.transit.realtime.GtfsRealtime
 
-class GtfsRtAlertDataSource(private val api: GtfsRtApi) {
+interface AlertDataSource {
+    suspend fun getAlerts(): List<ServiceAlert>
+}
 
-    suspend fun getAlerts(): List<ServiceAlert> {
+class GtfsRtAlertDataSource(private val api: GtfsRtApi) : AlertDataSource {
+
+    override suspend fun getAlerts(): List<ServiceAlert> {
         val feedMessage = api.fetchAlerts().getOrThrow()
         return feedMessage.entityList
             .filter { it.hasAlert() }

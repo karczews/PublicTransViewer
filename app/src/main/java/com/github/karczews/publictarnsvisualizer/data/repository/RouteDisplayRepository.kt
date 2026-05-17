@@ -9,15 +9,19 @@ import com.github.karczews.publictarnsvisualizer.data.model.LatLon
 import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
 import com.github.karczews.publictarnsvisualizer.data.model.RouteStop
 
-class RouteDisplayRepository(
+interface RouteDisplayRepository {
+    suspend fun loadRouteForTrip(tripId: String): RouteDisplayData?
+}
+
+class DefaultRouteDisplayRepository(
     private val tripDao: TripDao,
     private val routeDao: RouteDao,
     private val shapePointDao: ShapePointDao,
     private val stopTimeDao: StopTimeDao,
     private val stopDao: StopDao,
-) {
+) : RouteDisplayRepository {
 
-    suspend fun loadRouteForTrip(tripId: String): RouteDisplayData? {
+    override suspend fun loadRouteForTrip(tripId: String): RouteDisplayData? {
         val trip = tripDao.getTripById(tripId) ?: return null
         val route = routeDao.getRouteById(trip.routeId) ?: return null
 

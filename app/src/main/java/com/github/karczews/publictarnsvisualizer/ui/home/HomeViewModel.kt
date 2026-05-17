@@ -2,20 +2,22 @@ package com.github.karczews.publictarnsvisualizer.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
 import com.github.karczews.publictarnsvisualizer.data.model.VehiclePosition
 import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val repository: VehicleRepository,
     private val routeDisplayRepository: RouteDisplayRepository,
 ) : ViewModel() {
@@ -65,15 +67,5 @@ class HomeViewModel(
         _selectedVehicleId.value = null
         _routeDisplay.value = null
         routeLoadJob?.cancel()
-    }
-}
-
-class HomeViewModelFactory(
-    private val repository: VehicleRepository,
-    private val routeDisplayRepository: RouteDisplayRepository,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        @Suppress("UNCHECKED_CAST")
-        return HomeViewModel(repository, routeDisplayRepository) as T
     }
 }

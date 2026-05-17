@@ -6,9 +6,13 @@ import com.github.karczews.publictarnsvisualizer.data.model.VehicleType
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
 import com.google.transit.realtime.GtfsRealtime
 
-class GtfsRtVehicleDataSource(private val api: GtfsRtApi) {
+interface VehicleDataSource {
+    suspend fun getVehiclePositions(): List<VehiclePosition>
+}
 
-    suspend fun getVehiclePositions(): List<VehiclePosition> {
+class GtfsRtVehicleDataSource(private val api: GtfsRtApi) : VehicleDataSource {
+
+    override suspend fun getVehiclePositions(): List<VehiclePosition> {
         val feedMessage = api.fetchVehiclePositions().getOrThrow()
         return feedMessage.entityList
             .filter { it.hasVehicle() }

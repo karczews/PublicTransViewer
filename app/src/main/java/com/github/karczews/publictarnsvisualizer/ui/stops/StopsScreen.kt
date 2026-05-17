@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,7 +54,7 @@ fun StopsScreen(
             onValueChange = viewModel::onQueryChange,
             label = { Text("Search stops") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("search_field"),
         )
         Spacer(Modifier.height(12.dp))
 
@@ -93,7 +94,7 @@ private fun StopsList(
 
 @Composable
 private fun StopRow(stop: StopEntity, onClick: () -> Unit) {
-    Surface(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().testTag("stop_row_${stop.stopId}")) {
         Column(Modifier.padding(vertical = 12.dp, horizontal = 4.dp)) {
             Text(stop.stopName, style = MaterialTheme.typography.bodyLarge)
             if (!stop.stopCode.isNullOrBlank()) {
@@ -114,7 +115,7 @@ private fun DeparturesSection(
     onBack: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onBack) { Text("< Back") }
+        TextButton(onClick = onBack, modifier = Modifier.testTag("back_button")) { Text("< Back") }
         Spacer(Modifier.width(8.dp))
         Column {
             Text(stop.stopName, style = MaterialTheme.typography.titleMedium)

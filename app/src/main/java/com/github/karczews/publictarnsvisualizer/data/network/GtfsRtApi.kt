@@ -6,15 +6,21 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class GtfsRtApi(private val client: OkHttpClient) {
+interface GtfsRtApi {
+    suspend fun fetchVehiclePositions(): Result<FeedMessage>
+    suspend fun fetchTripUpdates(): Result<FeedMessage>
+    suspend fun fetchAlerts(): Result<FeedMessage>
+}
 
-    suspend fun fetchVehiclePositions(): Result<FeedMessage> =
+class GtfsRtApiImpl(private val client: OkHttpClient) : GtfsRtApi {
+
+    override suspend fun fetchVehiclePositions(): Result<FeedMessage> =
         fetchFeed(GtfsEndpoints.vehiclePositionsUrl())
 
-    suspend fun fetchTripUpdates(): Result<FeedMessage> =
+    override suspend fun fetchTripUpdates(): Result<FeedMessage> =
         fetchFeed(GtfsEndpoints.tripUpdatesUrl())
 
-    suspend fun fetchAlerts(): Result<FeedMessage> =
+    override suspend fun fetchAlerts(): Result<FeedMessage> =
         fetchFeed(GtfsEndpoints.alertsUrl())
 
     private suspend fun fetchFeed(url: String): Result<FeedMessage> = withContext(Dispatchers.IO) {

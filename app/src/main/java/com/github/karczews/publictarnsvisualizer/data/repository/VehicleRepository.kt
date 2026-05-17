@@ -4,7 +4,7 @@ import com.github.karczews.publictarnsvisualizer.data.db.dao.RouteDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.TripDao
 import com.github.karczews.publictarnsvisualizer.data.model.VehiclePosition
 import com.github.karczews.publictarnsvisualizer.data.model.VehicleType
-import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtVehicleDataSource
+import com.github.karczews.publictarnsvisualizer.data.source.VehicleDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,7 +14,7 @@ interface VehicleRepository {
 }
 
 class DefaultVehicleRepository(
-    private val dataSource: GtfsRtVehicleDataSource,
+    private val dataSource: VehicleDataSource,
     private val routeDao: RouteDao,
     private val tripDao: TripDao,
 ) : VehicleRepository {
