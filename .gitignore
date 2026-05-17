@@ -8,6 +8,7 @@ local.properties
 # Log/OS Files
 *.log
 .DS_Store
+Thumbs.db
 
 # Android Studio generated files and folders
 captures/
@@ -15,14 +16,23 @@ captures/
 .cxx/
 *.aab
 *.apk
+*.ap_
+*.dex
 output-metadata.json
 
-# IntelliJ
+# IntelliJ / Android Studio
 *.iml
 .idea/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+
+# Other IDEs
+.vscode/
+.fleet/
+
+# Kotlin
+.kotlin/
 
 # Keystore files
 *.jks
@@ -33,3 +43,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Claude Code local tooling
+.claude/
