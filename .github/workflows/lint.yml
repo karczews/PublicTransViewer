@@ -1,0 +1,28 @@
+name: Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew lintDebug -PtomtomApiKey=""
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-results
+          path: |
+            app/build/reports/lint-results-debug.html
+            app/build/reports/lint-results-debug.txt
+          retention-days: 7

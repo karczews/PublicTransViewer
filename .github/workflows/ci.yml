@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    uses: ./.github/workflows/run-tests.yml
+
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  build:
+    uses: ./.github/workflows/build.yml
+
+  gate:
+    if: github.event_name == 'pull_request'
+    needs: [unit-tests, lint, build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All checks passed"
