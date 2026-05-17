@@ -1,13 +1,31 @@
 package com.github.karczews.publictarnsvisualizer.ui.home
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.karczews.publictarnsvisualizer.R
 import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
@@ -17,21 +35,26 @@ import com.github.karczews.publictarnsvisualizer.data.model.VehicleType
 import com.tomtom.sdk.init.TomTomSdk
 import com.tomtom.sdk.location.GeoPoint
 import com.tomtom.sdk.map.display.MapLocationInfrastructure
+import com.tomtom.sdk.map.display.camera.CameraOptions
 import com.tomtom.sdk.map.display.camera.InitialCameraOptions
 import com.tomtom.sdk.map.display.common.WidthByZoom
 import com.tomtom.sdk.map.display.compose.TomTomMap
 import com.tomtom.sdk.map.display.compose.model.MapDisplayInfrastructure
 import com.tomtom.sdk.map.display.compose.model.MarkerData
 import com.tomtom.sdk.map.display.compose.model.PolylineData
+import com.tomtom.sdk.map.display.compose.nodes.CurrentLocationMarker
 import com.tomtom.sdk.map.display.compose.nodes.Marker
 import com.tomtom.sdk.map.display.compose.nodes.Polyline
+import com.tomtom.sdk.map.display.compose.properties.CurrentLocationMarkerProperties
 import com.tomtom.sdk.map.display.compose.properties.MarkerProperties
 import com.tomtom.sdk.map.display.compose.properties.PolylineProperties
+import com.tomtom.sdk.map.display.compose.state.rememberCurrentLocationMarkerState
 import com.tomtom.sdk.map.display.compose.state.rememberMapViewState
 import com.tomtom.sdk.map.display.compose.state.rememberMarkerState
 import com.tomtom.sdk.map.display.compose.state.rememberPolylineState
 import com.tomtom.sdk.map.display.image.ImageFactory
 import com.tomtom.sdk.map.display.marker.Label
+import kotlinx.coroutines.launch
 
 private val LODZ_CENTER = GeoPoint(latitude = 51.7592, longitude = 19.4560)
 private const val INITIAL_ZOOM = 13.0
@@ -59,25 +82,82 @@ fun HomeScreen(
         }
     }
     val mapViewState = rememberMapViewState(initialCameraOptions = initialCameraOptions)
+    val coroutineScope = rememberCoroutineScope()
+    val locationProvider = remember { TomTomSdk.locationProvider }
+    val context = LocalContext.current
 
-    TomTomMap(
-        state = mapViewState,
-        infrastructure = mapDisplayInfrastructure,
-        modifier = modifier.fillMaxSize(),
-        onMapClick = { viewModel.clearSelection() },
-    ) {
-        routeDisplay?.let { route ->
-            RouteOverlay(route = route)
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+        )
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted -> hasLocationPermission = granted }
+
+    DisposableEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            locationProvider.enable()
+            onDispose { locationProvider.disable() }
+        } else {
+            onDispose { }
         }
+    }
 
-        vehicles.forEach { vehicle ->
-            key(vehicle.vehicleId) {
-                VehicleMarker(
-                    vehicle = vehicle,
-                    isSelected = vehicle.vehicleId == selectedVehicleId,
-                    onSelect = { viewModel.onVehicleSelected(vehicle) },
+    Box(modifier = modifier.fillMaxSize()) {
+        TomTomMap(
+            state = mapViewState,
+            infrastructure = mapDisplayInfrastructure,
+            modifier = Modifier.fillMaxSize(),
+            onMapClick = { viewModel.clearSelection() },
+        ) {
+            if (hasLocationPermission) {
+                CurrentLocationMarker(
+                    properties = CurrentLocationMarkerProperties(),
+                    state = rememberCurrentLocationMarkerState(),
                 )
             }
+
+            routeDisplay?.let { route ->
+                RouteOverlay(route = route)
+            }
+
+            vehicles.forEach { vehicle ->
+                key(vehicle.vehicleId) {
+                    VehicleMarker(
+                        vehicle = vehicle,
+                        isSelected = vehicle.vehicleId == selectedVehicleId,
+                        onSelect = { viewModel.onVehicleSelected(vehicle) },
+                    )
+                }
+            }
+        }
+
+        FilledTonalIconButton(
+            onClick = {
+                if (!hasLocationPermission) {
+                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    return@FilledTonalIconButton
+                }
+                val location = locationProvider.lastKnownLocation
+                if (location != null) {
+                    coroutineScope.launch {
+                        mapViewState.cameraState.animateCamera(
+                            CameraOptions(position = location.position, zoom = 15.0),
+                        )
+                    }
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .size(48.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_my_location),
+                contentDescription = "Recenter to my location",
+            )
         }
     }
 }
