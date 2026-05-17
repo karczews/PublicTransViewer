@@ -49,7 +49,10 @@ class MainActivity : ComponentActivity() {
                 if (isReady) {
                     val app = application as PublicTransApp
                     PublicTarnsVisualizerApp(
-                        homeViewModelFactory = HomeViewModelFactory(app.vehicleRepository),
+                        homeViewModelFactory = HomeViewModelFactory(
+                            app.vehicleRepository,
+                            app.routeDisplayRepository,
+                        ),
                         stopsViewModelFactory = StopsViewModelFactory(app.stopRepository),
                     )
                 } else {

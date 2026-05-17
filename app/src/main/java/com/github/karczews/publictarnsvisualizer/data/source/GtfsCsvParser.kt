@@ -1,6 +1,7 @@
 package com.github.karczews.publictarnsvisualizer.data.source
 
 import com.github.karczews.publictarnsvisualizer.data.db.entity.RouteEntity
+import com.github.karczews.publictarnsvisualizer.data.db.entity.ShapePointEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopTimeEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.TripEntity
@@ -73,6 +74,37 @@ object GtfsCsvParser {
                         departureTime = fields.getValue(header, "departure_time"),
                         pickupType = fields.getOrNull(header, "pickup_type")?.toIntOrNull(),
                         dropOffType = fields.getOrNull(header, "drop_off_type")?.toIntOrNull(),
+                    )
+                )
+                if (batch.size >= batchSize) {
+                    kotlinx.coroutines.runBlocking { onBatch(batch.toList()) }
+                    batch.clear()
+                }
+            }
+        }
+        if (batch.isNotEmpty()) {
+            kotlinx.coroutines.runBlocking { onBatch(batch.toList()) }
+        }
+    }
+
+    fun parseShapesStreaming(
+        reader: BufferedReader,
+        batchSize: Int = 1000,
+        onBatch: suspend (List<ShapePointEntity>) -> Unit,
+    ) {
+        val headerLine = reader.readLine()?.stripBom() ?: return
+        val header = parseCsvLine(headerLine)
+        val batch = mutableListOf<ShapePointEntity>()
+
+        reader.forEachLine { line ->
+            val fields = parseCsvLine(line)
+            if (fields.size >= header.size) {
+                batch.add(
+                    ShapePointEntity(
+                        shapeId = fields.getValue(header, "shape_id"),
+                        shapePtSequence = fields.getValue(header, "shape_pt_sequence").toInt(),
+                        shapePtLat = fields.getValue(header, "shape_pt_lat").toDouble(),
+                        shapePtLon = fields.getValue(header, "shape_pt_lon").toDouble(),
                     )
                 )
                 if (batch.size >= batchSize) {

@@ -68,6 +68,15 @@ class GtfsStaticDataSource(
                                 }
                                 Log.d(TAG, "Imported $count stop times")
                             }
+                            "shapes.txt" -> {
+                                database.shapePointDao().deleteAll()
+                                var count = 0
+                                GtfsCsvParser.parseShapesStreaming(reader) { batch ->
+                                    database.shapePointDao().insertAll(batch)
+                                    count += batch.size
+                                }
+                                Log.d(TAG, "Imported $count shape points")
+                            }
                         }
                     }
                     zipStream.closeEntry()
@@ -93,6 +102,6 @@ class GtfsStaticDataSource(
     companion object {
         private const val TAG = "GtfsStaticDataSource"
         const val KEY_LAST_DOWNLOAD = "last_download_timestamp"
-        private val HANDLED_FILES = setOf("routes.txt", "stops.txt", "trips.txt", "stop_times.txt")
+        private val HANDLED_FILES = setOf("routes.txt", "stops.txt", "trips.txt", "stop_times.txt", "shapes.txt")
     }
 }

@@ -4,11 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.github.karczews.publictarnsvisualizer.data.db.dao.GtfsMetadataDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.RouteDao
+import com.github.karczews.publictarnsvisualizer.data.db.dao.ShapePointDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.StopDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.StopTimeDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.TripDao
 import com.github.karczews.publictarnsvisualizer.data.db.entity.GtfsMetadataEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.RouteEntity
+import com.github.karczews.publictarnsvisualizer.data.db.entity.ShapePointEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopTimeEntity
 import com.github.karczews.publictarnsvisualizer.data.db.entity.TripEntity
@@ -19,14 +21,16 @@ import com.github.karczews.publictarnsvisualizer.data.db.entity.TripEntity
         StopEntity::class,
         TripEntity::class,
         StopTimeEntity::class,
+        ShapePointEntity::class,
         GtfsMetadataEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 abstract class GtfsDatabase : RoomDatabase() {
     abstract fun routeDao(): RouteDao
     abstract fun stopDao(): StopDao
     abstract fun tripDao(): TripDao
     abstract fun stopTimeDao(): StopTimeDao
+    abstract fun shapePointDao(): ShapePointDao
     abstract fun metadataDao(): GtfsMetadataDao
 }

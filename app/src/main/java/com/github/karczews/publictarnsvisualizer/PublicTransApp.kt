@@ -9,6 +9,7 @@ import com.github.karczews.publictarnsvisualizer.data.db.GtfsDatabase
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
 import com.github.karczews.publictarnsvisualizer.data.repository.DefaultStopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.DefaultVehicleRepository
+import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtTripUpdateDataSource
@@ -34,7 +35,9 @@ class PublicTransApp : Application() {
     }
 
     val database: GtfsDatabase by lazy {
-        Room.databaseBuilder(this, GtfsDatabase::class.java, "gtfs.db").build()
+        Room.databaseBuilder(this, GtfsDatabase::class.java, "gtfs.db")
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
     }
 
     private val gtfsRtApi: GtfsRtApi by lazy { GtfsRtApi(httpClient) }
@@ -53,6 +56,16 @@ class PublicTransApp : Application() {
 
     val vehicleRepository: VehicleRepository by lazy {
         DefaultVehicleRepository(vehicleDataSource, database.routeDao(), database.tripDao())
+    }
+
+    val routeDisplayRepository: RouteDisplayRepository by lazy {
+        RouteDisplayRepository(
+            tripDao = database.tripDao(),
+            routeDao = database.routeDao(),
+            shapePointDao = database.shapePointDao(),
+            stopTimeDao = database.stopTimeDao(),
+            stopDao = database.stopDao(),
+        )
     }
 
     val stopRepository: StopRepository by lazy {
