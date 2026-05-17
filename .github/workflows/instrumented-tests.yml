@@ -2,6 +2,10 @@ name: Instrumented Tests
 
 on:
   workflow_call:
+    secrets:
+      TOMTOM_API_KEY:
+        required: false
+        description: "TomTom API key injected as Gradle project property"
 
 jobs:
   instrumented-tests:
@@ -22,12 +26,33 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-31-${{ runner.os }}-x86_64
+
+      - name: Create AVD snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
       - name: Run instrumented tests
         timeout-minutes: 30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
           arch: x86_64
+          force-avd-creation: false
           script: ./gradlew connectedDebugAndroidTest
           emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
           disable-animations: true

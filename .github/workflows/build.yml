@@ -2,6 +2,10 @@ name: Build
 
 on:
   workflow_call:
+    secrets:
+      TOMTOM_API_KEY:
+        required: false
+        description: "TomTom API key injected as Gradle project property"
 
 jobs:
   build:

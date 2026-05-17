@@ -14,19 +14,23 @@ concurrency:
 jobs:
   unit-tests:
     uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
+    secrets:
+      TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
 
   lint:
     uses: ./.github/workflows/lint.yml
-    secrets: inherit
+    secrets:
+      TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
 
   build:
     uses: ./.github/workflows/build.yml
-    secrets: inherit
+    secrets:
+      TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
 
   instrumented-tests:
     uses: ./.github/workflows/instrumented-tests.yml
-    secrets: inherit
+    secrets:
+      TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
 
   gate:
     if: github.event_name == 'pull_request'
