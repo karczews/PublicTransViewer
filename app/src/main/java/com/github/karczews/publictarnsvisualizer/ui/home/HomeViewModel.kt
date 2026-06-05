@@ -7,17 +7,21 @@ import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
 import com.github.karczews.publictarnsvisualizer.data.model.VehiclePosition
 import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+@ContributesIntoMap(AppScope::class)
+@ViewModelKey
+@Inject
+class HomeViewModel(
     private val repository: VehicleRepository,
     private val routeDisplayRepository: RouteDisplayRepository,
 ) : ViewModel() {

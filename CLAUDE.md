@@ -16,7 +16,7 @@ The TomTom API key must be set in `gradle.properties` as `tomtomApiKey=YOUR_KEY`
 
 ## Architecture
 
-Single-module Android app (`app/`) using MVVM with Jetpack Compose. No DI framework — all dependencies are wired manually via lazy properties in `PublicTransApp` (the `Application` subclass). ViewModels receive repositories through `ViewModelProvider.Factory` implementations.
+Single-module Android app (`app/`) using MVVM with Jetpack Compose. Dependency injection is handled by **Metro** (`dev.zacsweers.metro`), a compile-time DI compiler plugin. The application-wide graph is `di/AppGraph.kt` (`@DependencyGraph(AppScope::class)`); bindings are aggregated from `@ContributesTo` containers (`InfrastructureBindings`, `RepositoryBindings`), `@ContributesIntoMap` ViewModels (keyed by `@ViewModelKey`), and the `@WorkerKey` worker factory. `PublicTransApp` builds the graph via `createGraphFactory<AppGraph.Factory>().create(this)`. ViewModels are obtained in Compose with `metroViewModel()` (MetroX `metrox-viewmodel-compose`), backed by `InjectedViewModelFactory` exposed through `LocalMetroViewModelFactory`. Workers are built by `MetroWorkerFactory` using Metro assisted injection.
 
 ### Data Pipeline
 

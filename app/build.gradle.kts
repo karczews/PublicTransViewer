@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.metro)
 }
 
 val tomtomApiKey: String = findProperty("tomtomApiKey") as? String ?: ""
@@ -23,7 +23,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.github.karczews.publictarnsvisualizer.HiltTestRunner"
+        testInstrumentationRunner = "com.github.karczews.publictarnsvisualizer.MetroTestRunner"
 
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
@@ -79,11 +79,8 @@ dependencies {
     implementation(libs.gtfs.rt.bindings)
     implementation(libs.tomtom.sdk.init)
     implementation(libs.tomtom.sdk.map.display.compose)
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.hilt.work)
-    ksp(libs.hilt.compiler)
-    ksp(libs.hilt.work.compiler)
+    implementation(libs.metrox.viewmodel)
+    implementation(libs.metrox.viewmodel.compose)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.gtfs.rt.bindings)
@@ -91,8 +88,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

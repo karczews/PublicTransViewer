@@ -1,5 +1,6 @@
 package com.github.karczews.publictarnsvisualizer.di
 
+import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.github.karczews.publictarnsvisualizer.data.db.GtfsDatabase
@@ -10,14 +11,6 @@ import com.github.karczews.publictarnsvisualizer.data.db.dao.StopTimeDao
 import com.github.karczews.publictarnsvisualizer.data.db.dao.TripDao
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApi
 import com.github.karczews.publictarnsvisualizer.data.network.GtfsRtApiImpl
-import com.github.karczews.publictarnsvisualizer.data.repository.AlertRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.DefaultAlertRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.DefaultRouteDisplayRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.DefaultStopRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.DefaultVehicleRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
-import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
 import com.github.karczews.publictarnsvisualizer.data.source.AlertDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtAlertDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtTripUpdateDataSource
@@ -25,29 +18,37 @@ import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtVehicleDataSo
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.TripUpdateDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.VehicleDataSource
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object InfrastructureModule {
+/**
+ * Networking, database and data-source bindings.
+ *
+ * Direct translation of Hilt's `InfrastructureModule` (`@Module @InstallIn(SingletonComponent)`):
+ * a `@ContributesTo(AppScope)` interface whose `@Provides` functions are merged into every
+ * graph scoped to [AppScope]. `@SingleIn(AppScope::class)` replaces `@Singleton`.
+ */
+@ContributesTo(AppScope::class)
+interface InfrastructureBindings {
+
+    // Replaces Hilt's `@ApplicationContext Context`: the Application is bound by the graph factory.
+    @Provides
+    fun provideApplicationContext(application: Application): Context = application
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
     @Provides
-    @Singleton
-    fun provideGtfsDatabase(@ApplicationContext context: Context): GtfsDatabase =
+    @SingleIn(AppScope::class)
+    fun provideGtfsDatabase(context: Context): GtfsDatabase =
         Room.databaseBuilder(context, GtfsDatabase::class.java, "gtfs.db")
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
@@ -59,63 +60,23 @@ object InfrastructureModule {
     @Provides fun provideShapePointDao(db: GtfsDatabase): ShapePointDao = db.shapePointDao()
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideGtfsRtApi(client: OkHttpClient): GtfsRtApi = GtfsRtApiImpl(client)
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideVehicleDataSource(api: GtfsRtApi): VehicleDataSource = GtfsRtVehicleDataSource(api)
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideTripUpdateDataSource(api: GtfsRtApi): TripUpdateDataSource = GtfsRtTripUpdateDataSource(api)
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideAlertDataSource(api: GtfsRtApi): AlertDataSource = GtfsRtAlertDataSource(api)
 
     @Provides
-    @Singleton
+    @SingleIn(AppScope::class)
     fun provideGtfsStaticDataSource(client: OkHttpClient, db: GtfsDatabase): GtfsStaticDataSource =
         GtfsStaticDataSource(client, db)
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object RepositoryModule {
-
-    @Provides
-    @Singleton
-    fun provideVehicleRepository(
-        dataSource: VehicleDataSource,
-        routeDao: RouteDao,
-        tripDao: TripDao,
-    ): VehicleRepository = DefaultVehicleRepository(dataSource, routeDao, tripDao)
-
-    @Provides
-    @Singleton
-    fun provideRouteDisplayRepository(
-        tripDao: TripDao,
-        routeDao: RouteDao,
-        shapePointDao: ShapePointDao,
-        stopTimeDao: StopTimeDao,
-        stopDao: StopDao,
-    ): RouteDisplayRepository = DefaultRouteDisplayRepository(tripDao, routeDao, shapePointDao, stopTimeDao, stopDao)
-
-    @Provides
-    @Singleton
-    fun provideAlertRepository(
-        alertDataSource: AlertDataSource,
-        routeDao: RouteDao,
-    ): AlertRepository = DefaultAlertRepository(alertDataSource, routeDao)
-
-    @Provides
-    @Singleton
-    fun provideStopRepository(
-        stopDao: StopDao,
-        stopTimeDao: StopTimeDao,
-        tripDao: TripDao,
-        routeDao: RouteDao,
-        tripUpdateDataSource: TripUpdateDataSource,
-    ): StopRepository = DefaultStopRepository(stopDao, stopTimeDao, tripDao, routeDao, tripUpdateDataSource)
 }

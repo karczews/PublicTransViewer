@@ -1,5 +1,10 @@
 package com.github.karczews.publictarnsvisualizer
 
+import android.app.Application
+import com.github.karczews.publictarnsvisualizer.di.AppGraphOwner
+import com.github.karczews.publictarnsvisualizer.di.TestAppGraph
+import dev.zacsweers.metro.createGraphFactory
+import dev.zacsweers.metrox.viewmodel.MetroViewModelFactory
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.model.AlertCause
 import com.github.karczews.publictarnsvisualizer.data.model.AlertEffect
@@ -17,6 +22,17 @@ import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+
+/**
+ * Instrumented-test [Application] that builds the [TestAppGraph] (with fake repositories) and
+ * exposes its [MetroViewModelFactory] through [AppGraphOwner], mirroring the production
+ * [PublicTransApp]. Installed by [MetroTestRunner].
+ */
+class TestPublicTransApp : Application(), AppGraphOwner {
+    private val graph by lazy { createGraphFactory<TestAppGraph.Factory>().create(this) }
+    override val viewModelFactory: MetroViewModelFactory
+        get() = graph.viewModelFactory
+}
 
 object FixtureData {
 

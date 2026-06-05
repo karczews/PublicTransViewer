@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,9 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.github.karczews.publictarnsvisualizer.di.AppGraphOwner
 import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsScreen
 import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModel
 import com.github.karczews.publictarnsvisualizer.ui.home.HomeScreen
@@ -31,11 +32,11 @@ import com.github.karczews.publictarnsvisualizer.ui.theme.PublicTarnsVisualizerT
 import com.tomtom.sdk.common.configuration.buildSdkConfiguration
 import com.tomtom.sdk.init.TomTomSdk
 import com.tomtom.sdk.telemetry.UserConsent
-import dagger.hilt.android.AndroidEntryPoint
+import dev.zacsweers.metrox.viewmodel.LocalMetroViewModelFactory
+import dev.zacsweers.metrox.viewmodel.metroViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val sdkInitialized = MutableStateFlow(false)
@@ -44,11 +45,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         initTomTomSdk()
+        val viewModelFactory = (application as AppGraphOwner).viewModelFactory
         setContent {
             PublicTarnsVisualizerTheme {
                 val isReady by sdkInitialized.collectAsStateWithLifecycle()
                 if (isReady) {
-                    PublicTarnsVisualizerApp()
+                    CompositionLocalProvider(LocalMetroViewModelFactory provides viewModelFactory) {
+                        PublicTarnsVisualizerApp()
+                    }
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -98,15 +102,15 @@ fun PublicTarnsVisualizerApp() {
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> {
-                val homeViewModel: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = metroViewModel()
                 HomeScreen(viewModel = homeViewModel)
             }
             AppDestinations.STOPS -> {
-                val stopsViewModel: StopsViewModel = hiltViewModel()
+                val stopsViewModel: StopsViewModel = metroViewModel()
                 StopsScreen(viewModel = stopsViewModel)
             }
             AppDestinations.ALERTS -> {
-                val alertsViewModel: AlertsViewModel = hiltViewModel()
+                val alertsViewModel: AlertsViewModel = metroViewModel()
                 AlertsScreen(viewModel = alertsViewModel)
             }
         }
