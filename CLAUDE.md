@@ -16,7 +16,7 @@ The TomTom API key must be set in `gradle.properties` as `tomtomApiKey=YOUR_KEY`
 
 ## Architecture
 
-Single-module Android app (`app/`) using MVVM with Jetpack Compose. No DI framework — all dependencies are wired manually via lazy properties in `PublicTransApp` (the `Application` subclass). ViewModels receive repositories through `ViewModelProvider.Factory` implementations.
+Single-module Android app (`app/`) using MVVM with Jetpack Compose. Dependency injection uses **Koin with the Koin Compiler Plugin** (`io.insert-koin.compiler.plugin`) — the annotation-based, compile-time-verified config (not KSP). The graph lives in `di/AppModule.kt` (a `@Module @ComponentScan` class of `@Single` provider functions); view models are `@KoinViewModel`, the WorkManager worker is `@KoinWorker`, and `PublicTransApp` starts Koin via `startKoin<PublicTransKoinConfiguration>` (a `@KoinApplication` aggregator). `compileSafety`/`strictSafety` validate the whole graph at build time. Composables obtain view models with `koinViewModel()`. Instrumented tests swap the graph through `TestPublicTransApp` + `KoinTestRunner` (a plain DSL `testModule` of fakes).
 
 ### Data Pipeline
 

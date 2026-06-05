@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.model.StopDeparture
 import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +15,11 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.core.annotation.KoinViewModel
 
 @OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class StopsViewModel @Inject constructor(
+@KoinViewModel
+class StopsViewModel(
     private val repository: StopRepository,
 ) : ViewModel() {
 

@@ -4,16 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.karczews.publictarnsvisualizer.data.model.ServiceAlert
 import com.github.karczews.publictarnsvisualizer.data.repository.AlertRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel
-class AlertsViewModel @Inject constructor(
+@KoinViewModel
+class AlertsViewModel(
     private val repository: AlertRepository,
 ) : ViewModel() {
 

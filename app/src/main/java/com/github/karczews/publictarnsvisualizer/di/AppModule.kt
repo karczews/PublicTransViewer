@@ -25,76 +25,70 @@ import com.github.karczews.publictarnsvisualizer.data.source.GtfsRtVehicleDataSo
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.TripUpdateDataSource
 import com.github.karczews.publictarnsvisualizer.data.source.VehicleDataSource
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
+/**
+ * Koin module wiring the whole graph.
+ *
+ * Infrastructure, data sources and repositories are declared as [Single] provider functions
+ * (the equivalent of Dagger `@Provides`) because they need custom construction or interface
+ * binding. The [ComponentScan] picks up class-level definitions in the base package — the
+ * `@KoinViewModel` view models and the `@KoinWorker` worker.
+ *
+ * The Koin compiler plugin validates this graph at compile time (`compileSafety`); `android.content.Context`
+ * is part of the framework whitelist and is supplied at runtime by `androidContext()`.
+ */
 @Module
-@InstallIn(SingletonComponent::class)
-object InfrastructureModule {
+@ComponentScan("com.github.karczews.publictarnsvisualizer")
+class AppModule {
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    @Single
+    fun okHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    @Provides
-    @Singleton
-    fun provideGtfsDatabase(@ApplicationContext context: Context): GtfsDatabase =
+    @Single
+    fun gtfsDatabase(context: Context): GtfsDatabase =
         Room.databaseBuilder(context, GtfsDatabase::class.java, "gtfs.db")
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 
-    @Provides fun provideRouteDao(db: GtfsDatabase): RouteDao = db.routeDao()
-    @Provides fun provideStopDao(db: GtfsDatabase): StopDao = db.stopDao()
-    @Provides fun provideTripDao(db: GtfsDatabase): TripDao = db.tripDao()
-    @Provides fun provideStopTimeDao(db: GtfsDatabase): StopTimeDao = db.stopTimeDao()
-    @Provides fun provideShapePointDao(db: GtfsDatabase): ShapePointDao = db.shapePointDao()
+    @Single fun routeDao(db: GtfsDatabase): RouteDao = db.routeDao()
+    @Single fun stopDao(db: GtfsDatabase): StopDao = db.stopDao()
+    @Single fun tripDao(db: GtfsDatabase): TripDao = db.tripDao()
+    @Single fun stopTimeDao(db: GtfsDatabase): StopTimeDao = db.stopTimeDao()
+    @Single fun shapePointDao(db: GtfsDatabase): ShapePointDao = db.shapePointDao()
 
-    @Provides
-    @Singleton
-    fun provideGtfsRtApi(client: OkHttpClient): GtfsRtApi = GtfsRtApiImpl(client)
+    @Single
+    fun gtfsRtApi(client: OkHttpClient): GtfsRtApi = GtfsRtApiImpl(client)
 
-    @Provides
-    @Singleton
-    fun provideVehicleDataSource(api: GtfsRtApi): VehicleDataSource = GtfsRtVehicleDataSource(api)
+    @Single
+    fun vehicleDataSource(api: GtfsRtApi): VehicleDataSource = GtfsRtVehicleDataSource(api)
 
-    @Provides
-    @Singleton
-    fun provideTripUpdateDataSource(api: GtfsRtApi): TripUpdateDataSource = GtfsRtTripUpdateDataSource(api)
+    @Single
+    fun tripUpdateDataSource(api: GtfsRtApi): TripUpdateDataSource = GtfsRtTripUpdateDataSource(api)
 
-    @Provides
-    @Singleton
-    fun provideAlertDataSource(api: GtfsRtApi): AlertDataSource = GtfsRtAlertDataSource(api)
+    @Single
+    fun alertDataSource(api: GtfsRtApi): AlertDataSource = GtfsRtAlertDataSource(api)
 
-    @Provides
-    @Singleton
-    fun provideGtfsStaticDataSource(client: OkHttpClient, db: GtfsDatabase): GtfsStaticDataSource =
+    @Single
+    fun gtfsStaticDataSource(client: OkHttpClient, db: GtfsDatabase): GtfsStaticDataSource =
         GtfsStaticDataSource(client, db)
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object RepositoryModule {
-
-    @Provides
-    @Singleton
-    fun provideVehicleRepository(
+    @Single
+    fun vehicleRepository(
         dataSource: VehicleDataSource,
         routeDao: RouteDao,
         tripDao: TripDao,
     ): VehicleRepository = DefaultVehicleRepository(dataSource, routeDao, tripDao)
 
-    @Provides
-    @Singleton
-    fun provideRouteDisplayRepository(
+    @Single
+    fun routeDisplayRepository(
         tripDao: TripDao,
         routeDao: RouteDao,
         shapePointDao: ShapePointDao,
@@ -102,16 +96,14 @@ object RepositoryModule {
         stopDao: StopDao,
     ): RouteDisplayRepository = DefaultRouteDisplayRepository(tripDao, routeDao, shapePointDao, stopTimeDao, stopDao)
 
-    @Provides
-    @Singleton
-    fun provideAlertRepository(
+    @Single
+    fun alertRepository(
         alertDataSource: AlertDataSource,
         routeDao: RouteDao,
     ): AlertRepository = DefaultAlertRepository(alertDataSource, routeDao)
 
-    @Provides
-    @Singleton
-    fun provideStopRepository(
+    @Single
+    fun stopRepository(
         stopDao: StopDao,
         stopTimeDao: StopTimeDao,
         tripDao: TripDao,

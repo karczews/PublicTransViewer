@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.koin.compiler)
 }
 
 val tomtomApiKey: String = findProperty("tomtomApiKey") as? String ?: ""
@@ -23,7 +23,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.github.karczews.publictarnsvisualizer.HiltTestRunner"
+        testInstrumentationRunner = "com.github.karczews.publictarnsvisualizer.KoinTestRunner"
 
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
@@ -60,6 +60,14 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+koinCompiler {
+    // Compile-time dependency-graph validation (on by default; set explicitly to make the intent clear).
+    compileSafety = true
+    // Force the full-graph safety pass to run on every build instead of being skipped by
+    // Kotlin's incremental compilation cache (DSL/module lambda changes don't invalidate it otherwise).
+    strictSafety = true
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -79,11 +87,11 @@ dependencies {
     implementation(libs.gtfs.rt.bindings)
     implementation(libs.tomtom.sdk.init)
     implementation(libs.tomtom.sdk.map.display.compose)
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.hilt.work)
-    ksp(libs.hilt.compiler)
-    ksp(libs.hilt.work.compiler)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
+    implementation(libs.koin.annotations)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.gtfs.rt.bindings)
@@ -91,8 +99,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.compiler)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
