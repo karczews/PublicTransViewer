@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsScreen
@@ -31,11 +30,10 @@ import com.github.karczews.publictarnsvisualizer.ui.theme.PublicTarnsVisualizerT
 import com.tomtom.sdk.common.configuration.buildSdkConfiguration
 import com.tomtom.sdk.init.TomTomSdk
 import com.tomtom.sdk.telemetry.UserConsent
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val sdkInitialized = MutableStateFlow(false)
@@ -98,15 +96,15 @@ fun PublicTarnsVisualizerApp() {
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> {
-                val homeViewModel: HomeViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = koinViewModel()
                 HomeScreen(viewModel = homeViewModel)
             }
             AppDestinations.STOPS -> {
-                val stopsViewModel: StopsViewModel = hiltViewModel()
+                val stopsViewModel: StopsViewModel = koinViewModel()
                 StopsScreen(viewModel = stopsViewModel)
             }
             AppDestinations.ALERTS -> {
-                val alertsViewModel: AlertsViewModel = hiltViewModel()
+                val alertsViewModel: AlertsViewModel = koinViewModel()
                 AlertsScreen(viewModel = alertsViewModel)
             }
         }

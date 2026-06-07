@@ -1,5 +1,6 @@
 package com.github.karczews.publictarnsvisualizer
 
+import android.app.Application
 import com.github.karczews.publictarnsvisualizer.data.db.entity.StopEntity
 import com.github.karczews.publictarnsvisualizer.data.model.AlertCause
 import com.github.karczews.publictarnsvisualizer.data.model.AlertEffect
@@ -15,8 +16,40 @@ import com.github.karczews.publictarnsvisualizer.data.repository.AlertRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.StopRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
+import com.github.karczews.publictarnsvisualizer.ui.alerts.AlertsViewModel
+import com.github.karczews.publictarnsvisualizer.ui.home.HomeViewModel
+import com.github.karczews.publictarnsvisualizer.ui.stops.StopsViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
+
+/**
+ * Test [Application] installed by [KoinTestRunner]. Starts Koin with [testModule] only —
+ * fake repositories plus the real view models — so instrumented UI tests run against fixed
+ * data with no database, network, or WorkManager involvement.
+ */
+class TestPublicTransApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidContext(this@TestPublicTransApp)
+            modules(testModule)
+        }
+    }
+}
+
+val testModule = module {
+    single<VehicleRepository> { FixedVehicleRepository() }
+    single<RouteDisplayRepository> { FixedRouteDisplayRepository() }
+    single<AlertRepository> { FixedAlertRepository() }
+    single<StopRepository> { FixedStopRepository() }
+    viewModel { HomeViewModel(get(), get()) }
+    viewModel { StopsViewModel(get()) }
+    viewModel { AlertsViewModel(get()) }
+}
 
 object FixtureData {
 

@@ -1,17 +1,15 @@
 package com.github.karczews.publictarnsvisualizer.data.worker
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import org.koin.android.annotation.KoinWorker
 
-@HiltWorker
-class GtfsRefreshWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+@KoinWorker
+class GtfsRefreshWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val gtfsStaticDataSource: GtfsStaticDataSource,
 ) : CoroutineWorker(appContext, params) {
 

@@ -2,36 +2,47 @@ package com.github.karczews.publictarnsvisualizer
 
 import android.app.Application
 import android.util.Log
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.karczews.publictarnsvisualizer.data.source.GtfsStaticDataSource
 import com.github.karczews.publictarnsvisualizer.data.worker.GtfsRefreshWorker
-import dagger.hilt.android.HiltAndroidApp
+import com.github.karczews.publictarnsvisualizer.di.AppModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.annotation.KoinApplication
+import org.koin.plugin.module.dsl.startKoin
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-@HiltAndroidApp
-class PublicTransApp : Application(), Configuration.Provider {
+/**
+ * Aggregator type for the Koin compiler plugin: declares which annotated modules make up the
+ * application graph. `startKoin<PublicTransKoinConfiguration>()` loads [AppModule] and triggers
+ * the compile-time full-graph safety check.
+ */
+@KoinApplication(modules = [AppModule::class])
+internal object PublicTransKoinConfiguration
 
-    @Inject lateinit var workerFactory: HiltWorkerFactory
-    @Inject lateinit var gtfsStaticDataSource: GtfsStaticDataSource
+class PublicTransApp : Application() {
+
+    private val gtfsStaticDataSource: GtfsStaticDataSource by inject()
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-
     override fun onCreate() {
         super.onCreate()
+        startKoin<PublicTransKoinConfiguration> {
+            androidLogger()
+            androidContext(this@PublicTransApp)
+            // Registers KoinWorkerFactory and initializes WorkManager (the default
+            // WorkManagerInitializer is removed in the manifest). Must run after androidContext().
+            workManagerFactory()
+        }
         scheduleGtfsRefresh()
         triggerInitialGtfsDownloadIfNeeded()
     }

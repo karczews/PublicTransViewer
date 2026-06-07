@@ -7,17 +7,16 @@ import com.github.karczews.publictarnsvisualizer.data.model.RouteDisplayData
 import com.github.karczews.publictarnsvisualizer.data.model.VehiclePosition
 import com.github.karczews.publictarnsvisualizer.data.repository.RouteDisplayRepository
 import com.github.karczews.publictarnsvisualizer.data.repository.VehicleRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.core.annotation.KoinViewModel
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+@KoinViewModel
+class HomeViewModel(
     private val repository: VehicleRepository,
     private val routeDisplayRepository: RouteDisplayRepository,
 ) : ViewModel() {
