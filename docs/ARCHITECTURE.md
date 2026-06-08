@@ -186,9 +186,11 @@ erDiagram
 
 ## Application Architecture
 
-The app follows **MVVM** with a unidirectional data flow. No dependency injection
-framework is used; dependencies are wired manually in `PublicTransportApp` (the
-`Application` subclass) using lazy properties.
+The app follows **MVVM** with a unidirectional data flow. Dependency injection is
+handled by **Koin** (with the Koin compiler plugin): the graph is defined in
+`di/AppModule.kt`, view models are `@KoinViewModel`, the WorkManager worker is
+`@KoinWorker`, and `PublicTransportApp` (the `Application` subclass) starts Koin
+via `startKoin<PublicTransportKoinConfiguration>`.
 
 ```mermaid
 graph TB
