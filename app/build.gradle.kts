@@ -9,7 +9,7 @@ plugins {
 val tomtomApiKey: String = findProperty("tomtomApiKey") as? String ?: ""
 
 android {
-    namespace = "com.github.karczews.publictarnsvisualizer"
+    namespace = "com.github.karczews.publictransportviewer"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -17,13 +17,13 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.github.karczews.publictarnsvisualizer"
+        applicationId = "com.github.karczews.publictransportviewer"
         minSdk = 32
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.github.karczews.publictarnsvisualizer.KoinTestRunner"
+        testInstrumentationRunner = "com.github.karczews.publictransportviewer.KoinTestRunner"
 
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "x86_64"))

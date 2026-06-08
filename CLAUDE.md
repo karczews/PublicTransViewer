@@ -16,7 +16,7 @@ The TomTom API key must be set in `gradle.properties` as `tomtomApiKey=YOUR_KEY`
 
 ## Architecture
 
-Single-module Android app (`app/`) using MVVM with Jetpack Compose. Dependency injection uses **Koin with the Koin Compiler Plugin** (`io.insert-koin.compiler.plugin`) — the annotation-based, compile-time-verified config (not KSP). The graph lives in `di/AppModule.kt` (a `@Module @ComponentScan` class of `@Single` provider functions); view models are `@KoinViewModel`, the WorkManager worker is `@KoinWorker`, and `PublicTransApp` starts Koin via `startKoin<PublicTransKoinConfiguration>` (a `@KoinApplication` aggregator). `compileSafety`/`strictSafety` validate the whole graph at build time. Composables obtain view models with `koinViewModel()`. Instrumented tests swap the graph through `TestPublicTransApp` + `KoinTestRunner` (a plain DSL `testModule` of fakes).
+Single-module Android app (`app/`) using MVVM with Jetpack Compose. Dependency injection uses **Koin with the Koin Compiler Plugin** (`io.insert-koin.compiler.plugin`) — the annotation-based, compile-time-verified config (not KSP). The graph lives in `di/AppModule.kt` (a `@Module @ComponentScan` class of `@Single` provider functions); view models are `@KoinViewModel`, the WorkManager worker is `@KoinWorker`, and `PublicTransportApp` starts Koin via `startKoin<PublicTransportKoinConfiguration>` (a `@KoinApplication` aggregator). `compileSafety`/`strictSafety` validate the whole graph at build time. Composables obtain view models with `koinViewModel()`. Instrumented tests swap the graph through `TestPublicTransportApp` + `KoinTestRunner` (a plain DSL `testModule` of fakes).
 
 ### Data Pipeline
 
@@ -40,7 +40,7 @@ Realtime data is enriched with static GTFS data from Room. Repositories fetch ra
 
 ## Conventions
 
-- Base package: `com.github.karczews.publictarnsvisualizer` (note: "tarns" is an intentional early typo preserved in the package name)
+- Base package: `com.github.karczews.publictransportviewer`
 - TomTom SDK flavor: `complete` (set via `missingDimensionStrategy` in build.gradle.kts)
 - Room schemas exported to `app/schemas/`
 - NDK ABI filters: `arm64-v8a` and `x86_64` only
