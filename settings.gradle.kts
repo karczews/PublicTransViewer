@@ -23,5 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PublicTarnsVisualizer"
+rootProject.name = "PublicTransportViewer"
 include(":app")

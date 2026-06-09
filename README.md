@@ -1,4 +1,4 @@
-# PublicTransViewer
+# PublicTransportViewer
 
 Real-time public transport viewer for the city of Lodz, Poland. Displays live
 tram and bus positions on a TomTom map, stop departure boards with delay

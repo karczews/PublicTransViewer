@@ -1,6 +1,6 @@
-# PublicTransViewer - Architecture Documentation
+# PublicTransportViewer - Architecture Documentation
 
-PublicTransViewer is an Android application that displays real-time public transport
+PublicTransportViewer is an Android application that displays real-time public transport
 data for the city of Lodz (Poland) on an interactive map. It shows live vehicle
 positions (trams and buses), stop departure boards with real-time delays, and
 service alerts.
@@ -186,9 +186,11 @@ erDiagram
 
 ## Application Architecture
 
-The app follows **MVVM** with a unidirectional data flow. No dependency injection
-framework is used; dependencies are wired manually in `PublicTransApp` (the
-`Application` subclass) using lazy properties.
+The app follows **MVVM** with a unidirectional data flow. Dependency injection is
+handled by **Koin** (with the Koin compiler plugin): the graph is defined in
+`di/AppModule.kt`, view models are `@KoinViewModel`, the WorkManager worker is
+`@KoinWorker`, and `PublicTransportApp` (the `Application` subclass) starts Koin
+via `startKoin<PublicTransportKoinConfiguration>`.
 
 ```mermaid
 graph TB
@@ -379,7 +381,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant OS as Android OS
-    participant App as PublicTransApp
+    participant App as PublicTransportApp
     participant WM as WorkManager
     participant SDS as GtfsStaticDataSource
     participant Act as MainActivity
@@ -504,8 +506,8 @@ stateDiagram-v2
 ## Project Structure
 
 ```
-app/src/main/java/com/github/karczews/publictarnsvisualizer/
-├── PublicTransApp.kt              # Application class, dependency wiring
+app/src/main/java/com/github/karczews/publictransportviewer/
+├── PublicTransportApp.kt              # Application class, dependency wiring
 ├── MainActivity.kt                # TomTom SDK init, navigation scaffold
 ├── data/
 │   ├── db/
