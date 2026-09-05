@@ -15,7 +15,7 @@ gtfsRtBindings = "0.1.0"
 workmanager = "2.11.2"
 coroutinesTest = "1.11.0"
 koin = "4.2.2"
-koinCompiler = "1.0.1"
+koinCompiler = "1.1.0"
 tomtomSdk = "2.4.2"
 
 [libraries]
