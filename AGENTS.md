@@ -50,3 +50,4 @@ Realtime data is enriched with static GTFS data from Room. Repositories fetch ra
 - Room schemas exported to `app/schemas/`
 - NDK ABI filters: `arm64-v8a` and `x86_64` only
 - Dependency versions live in the version catalog `gradle/libs.versions.toml` — resolve and bump them there, not in `app/build.gradle.kts`
+- Commits follow Conventional Commits (`type(scope): subject`); branches follow `type/short-task-description` (e.g. `chore/xxx`, `feat/xxx`) — see `CONTRIBUTING.md`
