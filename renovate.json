@@ -2,5 +2,19 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Hold Kotlin below 2.4: Koin compiler plugin 1.0.1 supports max Kotlin 2.4.0 per vendor table (2.4.20 crashes with NoSuchMethodError: IrUtilsKt.getValueArgument); KSP has no Kotlin 2.4 release yet. Remove hold once both support Kotlin 2.4.",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["org.jetbrains.kotlin.plugin.compose"],
+      "allowedVersions": "<2.4"
+    },
+    {
+      "description": "Hold all org.jetbrains.kotlin Gradle/maven artifacts below 2.4 for the same reason (Koin compiler plugin max Kotlin 2.4.0; KSP has no 2.4 release yet). Remove hold once both support Kotlin 2.4.",
+      "matchManagers": ["gradle"],
+      "matchPackagePrefixes": ["org.jetbrains.kotlin"],
+      "allowedVersions": "<2.4"
+    }
   ]
 }
