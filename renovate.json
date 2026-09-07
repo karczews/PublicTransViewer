@@ -33,6 +33,18 @@
       "description": "Automerge lock-file maintenance",
       "matchUpdateTypes": ["lockFileMaintenance"],
       "automerge": true
+    },
+    {
+      "description": "Hold Kotlin at versions supported by koin-compiler (Kotlin 2.4.20 crashes koin-compiler with NoSuchMethodError: IrUtilsKt.getValueArgument; verified ceiling is 2.4.0). Lift once koin-compiler supports newer Kotlin.",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["org.jetbrains.kotlin.plugin.compose"],
+      "allowedVersions": "<2.4.10"
+    },
+    {
+      "description": "Hold all org.jetbrains.kotlin artifacts for the same reason (koin-compiler ceiling). Lift once koin-compiler supports newer Kotlin.",
+      "matchManagers": ["gradle"],
+      "matchPackagePrefixes": ["org.jetbrains.kotlin"],
+      "allowedVersions": "<2.4.10"
     }
   ]
 }
