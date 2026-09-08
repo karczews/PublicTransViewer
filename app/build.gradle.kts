@@ -81,8 +81,15 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     implementation(libs.okhttp)
     implementation(libs.gtfs.rt.bindings)
-    implementation(libs.tomtom.sdk.init)
-    implementation(libs.tomtom.sdk.map.display.compose)
+    implementation(libs.tomtom.sdk.init) {
+        // TomTom pulls protobuf-javalite which duplicates classes in protobuf-java
+        // (brought by org.mobilitydata:gtfs-realtime-bindings). protobuf-java is the
+        // superset and required by the GTFS bindings' GeneratedMessageV3 code, so drop lite.
+        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
+    }
+    implementation(libs.tomtom.sdk.map.display.compose) {
+        exclude(group = "com.google.protobuf", module = "protobuf-javalite")
+    }
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
