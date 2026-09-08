@@ -43,7 +43,7 @@
     {
       "description": "Hold all org.jetbrains.kotlin artifacts for the same reason (koin-compiler ceiling). Lift once koin-compiler supports newer Kotlin.",
       "matchManagers": ["gradle"],
-      "matchPackagePrefixes": ["org.jetbrains.kotlin"],
+      "matchPackagePrefixes": ["org.jetbrains.kotlin."],
       "allowedVersions": "<2.4.10"
     }
   ]
